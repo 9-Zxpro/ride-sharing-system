@@ -1,24 +1,21 @@
 package me.jibajo.captain_service.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "captain_earnings")
-@Data
-@Builder
-@AllArgsConstructor
+@Setter
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CaptainEarnings{
-
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long earningsId;
 
     @ManyToOne
