@@ -18,7 +18,7 @@ public class Vehicle {
     private String registrationNumber;
     private String registrationUrl;
 
-    @OneToOne(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "vehicle", orphanRemoval = true)
     @JsonBackReference
     private Captain captain;
 

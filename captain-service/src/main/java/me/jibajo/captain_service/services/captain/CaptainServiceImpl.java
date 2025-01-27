@@ -1,6 +1,5 @@
 package me.jibajo.captain_service.services.captain;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import me.jibajo.captain_service.dto.CaptainDTO;
 import me.jibajo.captain_service.entities.Captain;
@@ -13,10 +12,11 @@ import me.jibajo.captain_service.requests.CaptainRegRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CaptainServiceImpl implements ICaptainService {
 
     private final CaptainRepository captainRepository;
@@ -35,6 +35,7 @@ public class CaptainServiceImpl implements ICaptainService {
 
         Captain captain = captainCreate(captainRegRequest);
         captain.setVehicle(savedVehicle);
+        captain.setCreatedAt(LocalDateTime.now());
 
         return captainRepository.save(captain);
     }
@@ -117,6 +118,7 @@ public class CaptainServiceImpl implements ICaptainService {
         Captain captain = new Captain();
         captain.setEmail(captainRegRequest.getEmail());
         captain.setPhone(captainRegRequest.getPhone());
+        captain.setPassword(captainRegRequest.getPassword());
         captain.setDrivingLicenseUrl(captainRegRequest.getDrivingLicenseUrl());
         return captain;
     }

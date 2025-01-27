@@ -1,12 +1,12 @@
 package me.jibajo.rider_service.controller;
 
+import me.jibajo.rider_service.dto.RiderPhoneDto;
 import me.jibajo.rider_service.entities.Rider;
+import me.jibajo.rider_service.responses.APIResponse;
 import me.jibajo.rider_service.services.IRiderService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/riders")
@@ -18,34 +18,62 @@ public class RiderController {
         this.riderService = riderService;
     }
 
-    @PostMapping
-    public ResponseEntity<Rider> createRider(@RequestBody Rider rider) {
-        Rider createdRider = riderService.createRider(rider);
-        return ResponseEntity.ok(createdRider);
+    @PostMapping("/add")
+    public ResponseEntity<APIResponse> createRider(@RequestBody RiderPhoneDto rider) {
+        try {
+            return ResponseEntity.ok(new APIResponse("Success", riderService.createRider(rider)));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new APIResponse(e.getMessage(), null));
+        }
     }
 
     @GetMapping("/{riderId}")
-    public ResponseEntity<Rider> getRiderById(@PathVariable Long riderId) {
-        Optional<Rider> rider = riderService.getRiderById(riderId);
-        return rider.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<APIResponse> getRiderById(@PathVariable Long riderId) {
+        try {
+            return ResponseEntity.ok(new APIResponse("Success", riderService.getRiderById(riderId)));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new APIResponse(e.getMessage(), null));
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<Rider>> getAllRiders() {
-        List<Rider> riders = riderService.getAllRiders();
-        return ResponseEntity.ok(riders);
+    public ResponseEntity<APIResponse> getAllRiders() {
+        try {
+            return ResponseEntity.ok(new APIResponse("Success", riderService.getAllRiders()));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new APIResponse(e.getMessage(), null));
+        }
     }
 
+//    TODO: use @PatchMapping to update details
     @PutMapping("/{riderId}")
-    public ResponseEntity<Rider> updateRider(@PathVariable Long riderId, @RequestBody Rider updatedRider) {
-        Rider rider = riderService.updateRider(riderId, updatedRider);
-        return ResponseEntity.ok(rider);
+    public ResponseEntity<APIResponse> updateRider(@PathVariable Long riderId, @RequestBody Rider updatedRider) {
+        try {
+            return ResponseEntity
+                    .ok(new APIResponse("Success", riderService.updateRider(riderId, updatedRider)));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new APIResponse(e.getMessage(), null));
+        }
     }
 
     @DeleteMapping("/{riderId}")
-    public ResponseEntity<Void> deleteRider(@PathVariable Long riderId) {
-        riderService.deleteRider(riderId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<APIResponse> deleteRider(@PathVariable Long riderId) {
+        try {
+            riderService.deleteRider(riderId);
+            return ResponseEntity.ok(new APIResponse("Successfully deleted", null));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new APIResponse(e.getMessage(), null));
+        }
     }
 }
 

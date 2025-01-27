@@ -12,7 +12,7 @@
 	<artifactId>captain-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>captain-service</name>
-	<description>Ride sharing project for Spring Boot</description>
+	<description>Ride sharing project</description>
 	<url/>
 	<licenses>
 		<license/>

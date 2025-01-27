@@ -1,4 +1,4 @@
-package me.jibajo.captain_service.exceptions;
+package me.jibajo.admin_service.exceptions;
 
 public class AlreadyExistsException extends RuntimeException {
     public AlreadyExistsException(String message) {

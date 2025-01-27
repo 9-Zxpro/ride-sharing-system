@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface RiderRepository extends JpaRepository<Rider, Long> {
     Optional<Rider> findByEmail(String email);
     Optional<Rider> findByPhone(String phone);
+    Boolean existsByPhone(String phone);
 }

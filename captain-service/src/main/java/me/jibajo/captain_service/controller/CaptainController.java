@@ -1,6 +1,5 @@
 package me.jibajo.captain_service.controller;
 
-import me.jibajo.captain_service.dto.CaptainDTO;
 import me.jibajo.captain_service.exceptions.NotFoundException;
 import me.jibajo.captain_service.requests.CaptainRegRequest;
 import me.jibajo.captain_service.responses.APIResponse;
@@ -8,8 +7,6 @@ import me.jibajo.captain_service.services.captain.ICaptainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -36,8 +33,7 @@ public class CaptainController {
     @GetMapping("/{id}")
     public ResponseEntity<APIResponse> getCaptainById(@PathVariable Long id) {
         try {
-            CaptainDTO captainDTO = captainService.getCaptainById(id);
-            return ResponseEntity.ok(new APIResponse("Success", captainDTO));
+            return ResponseEntity.ok(new APIResponse("Success", captainService.getCaptainById(id)));
         } catch (NotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
@@ -52,6 +48,8 @@ public class CaptainController {
         }
     }
 
+
+//    TODO: Make it patchMapping to update individually
     @PutMapping("/update/{id}")
     public ResponseEntity<APIResponse> updateCaptain(@PathVariable Long id, @RequestBody CaptainRegRequest updatedCaptain) {
         try {

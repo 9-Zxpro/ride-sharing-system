@@ -4,12 +4,11 @@ import lombok.Data;
 
 @Data
 public class CaptainDTO {
-    private Long Id;
+    private Long captainId;
     private String email;
     private String phone;
-//    private String vehicleType = "Bike";
-    private String model;
-    private String vehicleRegNumber;
-    private String vehicleRegistrationUrl;
     private String drivingLicenseUrl;
+    private String vehicleModel;
+    private String vehicleRegistrationNumber;
+    private String vehicleRegistrationUrl;
 }

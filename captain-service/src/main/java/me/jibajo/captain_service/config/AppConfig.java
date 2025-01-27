@@ -1,4 +1,4 @@
-package me.jibajo.captain_service.security;
+package me.jibajo.captain_service.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

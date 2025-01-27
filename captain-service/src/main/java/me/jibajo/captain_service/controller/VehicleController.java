@@ -6,7 +6,6 @@ import me.jibajo.captain_service.entities.Vehicle;
 import me.jibajo.captain_service.exceptions.NotFoundException;
 import me.jibajo.captain_service.responses.APIResponse;
 import me.jibajo.captain_service.services.vehicle.IVehicleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

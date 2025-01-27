@@ -16,19 +16,18 @@ import java.time.LocalDateTime;
 public class Rider {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long riderId; // Shared with Authentication Service
+    private Long riderId;
 
     @Column(unique = true)
     private String email;
     @Column(unique = true, nullable = false)
     private String phone;
-//    @Getter(AccessLevel.NONE)
-    private String password;
 
-    private Boolean isActive;
+    private Boolean isActive = true;
     private Boolean emailVerified = false;
     private Boolean phoneVerified = false;
 
     @CreatedDate
     private LocalDateTime createdAt;
+
 }

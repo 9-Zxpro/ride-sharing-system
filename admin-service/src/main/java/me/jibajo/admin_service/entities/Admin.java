@@ -3,6 +3,10 @@ package me.jibajo.admin_service.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import me.jibajo.admin_service.enums.Role;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -10,7 +14,7 @@ import lombok.Setter;
 public class Admin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long adminId;
 
     @Column(nullable = false)
@@ -19,10 +23,17 @@ public class Admin {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String phone;
 
-    private String role; // e.g., SUPER_ADMIN, MODERATOR
+    @Column(nullable = false)
+    private String password;
 
-    // Getters and Setters
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
+
+    @CreatedDate
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
 }

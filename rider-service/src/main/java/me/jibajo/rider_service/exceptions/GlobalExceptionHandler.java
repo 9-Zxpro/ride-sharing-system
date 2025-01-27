@@ -1,4 +1,4 @@
-package me.jibajo.captain_service.exceptions;
+package me.jibajo.rider_service.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -23,10 +23,9 @@ public class Captain {
     private String phone;
 
     @Column(nullable = false)
-//    @Getter(value = AccessLevel.NONE)
     private String password;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "vehicle_id")
     @JsonManagedReference
     private Vehicle vehicle;
@@ -34,29 +33,13 @@ public class Captain {
     @Column(unique = true, nullable = false)
     private String drivingLicenseUrl;
 
-    private Boolean isAvailable;
-    private Boolean isActive;
+    private Boolean isAvailable = false;
+    private Boolean isActive = true;
     private Boolean emailVerified = false;
     private Boolean phoneVerified = false;
 
     @CreatedDate
     private LocalDateTime createdAt;
-
-    public Captain(String email, String phone, String password, Vehicle vehicle,
-                   String drivingLicenseUrl, Boolean isAvailable, Boolean isActive,
-                   Boolean emailVerified, Boolean phoneVerified, LocalDateTime createdAt) {
-        this.email = email;
-        this.phone = phone;
-        this.password = password;
-        this.vehicle = vehicle;
-        this.drivingLicenseUrl = drivingLicenseUrl;
-        this.isAvailable = isAvailable;
-        this.isActive = isActive;
-        this.emailVerified = emailVerified;
-        this.phoneVerified = phoneVerified;
-        this.createdAt = createdAt;
-    }
-
 
 }
 
