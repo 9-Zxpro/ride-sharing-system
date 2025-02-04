@@ -3,8 +3,10 @@ package me.jibajo.ride_managemant_service.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import me.jibajo.ride_managemant_service.enums.RideStatus;
 
 import java.time.Instant;
+
 @Getter
 @Setter
 @Entity
@@ -19,7 +21,6 @@ public class Ride {
 
     @Embedded
     private Location pickupLocation;
-
     @Embedded
     private Location dropoffLocation;
 
@@ -30,5 +31,9 @@ public class Ride {
     private Double fare;
 
     @Enumerated(EnumType.STRING)
-    private RideStatus status; // REQUESTED, ACCEPTED, ONGOING, COMPLETED, CANCELLED
+    private RideStatus status;
+
+    @Column(nullable = false)
+    private Instant createdAt;
+    private Instant updatedAt;
 }

@@ -11,8 +11,8 @@
 	<groupId>me.jibajo</groupId>
 	<artifactId>ride-managemant-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ride-managemant-service</name>
-	<description>ride management service for ride-sharing system</description>
+	<name>ride-management-service</name>
+	<description>Ride management service for ride-sharing system</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -54,6 +54,15 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
