@@ -18,11 +18,21 @@ public class Ride {
 
     private Long riderId;
     private Long captainId;
+    private String origin;
+    private String destination;
 
     @Embedded
-    private Location pickupLocation;
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "pickup_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "pickup_longitude"))
+    })
+    private Location pickup;
     @Embedded
-    private Location dropoffLocation;
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "dropoff_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "dropoff_longitude"))
+    })
+    private Location dropOff;
 
     private Instant rideStartTime;
     private Instant rideEndTime;

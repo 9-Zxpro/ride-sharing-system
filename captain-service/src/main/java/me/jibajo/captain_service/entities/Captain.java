@@ -33,7 +33,7 @@ public class Captain {
     @Column(unique = true, nullable = false)
     private String drivingLicenseUrl;
 
-    private Boolean isAvailable = false;
+    private Boolean isOnline = false;
     private Boolean isActive = true;
     private Boolean emailVerified = false;
     private Boolean phoneVerified = false;

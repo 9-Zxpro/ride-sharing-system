@@ -1,0 +1,263 @@
+[
+  {
+    "destination_addresses": [
+      "Sector 18, Noida, Uttar Pradesh, India"
+    ],
+    "origin_addresses": [
+      "Sector 62, Noida, Uttar Pradesh, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "7.2 km",
+              "value": 7225
+            },
+            "duration": {
+              "text": "18 mins",
+              "value": 1097
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Connaught Place, New Delhi, Delhi, India"
+    ],
+    "origin_addresses": [
+      "India Gate, New Delhi, Delhi, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "2.5 km",
+              "value": 2518
+            },
+            "duration": {
+              "text": "8 mins",
+              "value": 484
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "AIIMS, Ansari Nagar, New Delhi, Delhi 110029, India"
+    ],
+    "origin_addresses": [
+      "Safdarjung Hospital, Ansari Nagar East, New Delhi, Delhi 110029, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "1.2 km",
+              "value": 1234
+            },
+            "duration": {
+              "text": "5 mins",
+              "value": 312
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Red Fort, Chandni Chowk, New Delhi, Delhi 110006, India"
+    ],
+    "origin_addresses": [
+      "Jama Masjid, Meena Bazaar, Chandni Chowk, New Delhi, Delhi 110006, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "0.5 km",
+              "value": 500
+            },
+            "duration": {
+              "text": "3 mins",
+              "value": 180
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Qutub Minar, Mehrauli, New Delhi, Delhi 110030, India"
+    ],
+    "origin_addresses": [
+      "Humayun's Tomb, Mathura Road, Nizamuddin, New Delhi, Delhi 110013, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "15.2 km",
+              "value": 15200
+            },
+            "duration": {
+              "text": "35 mins",
+              "value": 2100
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Hauz Khas Village, Deer Park, Hauz Khas, New Delhi, Delhi 110016, India"
+    ],
+    "origin_addresses": [
+      "Lodhi Garden, Lodhi Estate, New Delhi, Delhi 110003, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "6.8 km",
+              "value": 6800
+            },
+            "duration": {
+              "text": "20 mins",
+              "value": 1200
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Akshardham Temple, Noida Mor, Pandav Nagar, New Delhi, Delhi 110092, India"
+    ],
+    "origin_addresses": [
+      "Jantar Mantar, Connaught Place, New Delhi, Delhi 110001, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "12.5 km",
+              "value": 12500
+            },
+            "duration": {
+              "text": "30 mins",
+              "value": 1800
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "National Museum, Janpath, New Delhi, Delhi 110011, India"
+    ],
+    "origin_addresses": [
+      "National Gallery of Modern Art, Jaipur House, India Gate, New Delhi, Delhi 110003, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "1.8 km",
+              "value": 1800
+            },
+            "duration": {
+              "text": "7 mins",
+              "value": 420
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Raj Ghat, Mahatma Gandhi Rd, New Delhi, Delhi 110002, India"
+    ],
+    "origin_addresses": [
+      "Shanti Van, Ring Rd, New Delhi, Delhi 110002, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "2.2 km",
+              "value": 2200
+            },
+            "duration": {
+              "text": "10 mins",
+              "value": 600
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  },
+  {
+    "destination_addresses": [
+      "Gurudwara Bangla Sahib, Ashoka Rd, Connaught Place, New Delhi, Delhi 110001, India"
+    ],
+    "origin_addresses": [
+      "Sis Ganj Gurudwara, Chandni Chowk, New Delhi, Delhi 110006, India"
+    ],
+    "rows": [
+      {
+        "elements": [
+          {
+            "status": "OK",
+            "distance": {
+              "text": "4.5 km",
+              "value": 4500
+            },
+            "duration": {
+              "text": "15 mins",
+              "value": 900
+            }
+          }
+        ]
+      }
+    ],
+    "status": "OK"
+  }
+]
+

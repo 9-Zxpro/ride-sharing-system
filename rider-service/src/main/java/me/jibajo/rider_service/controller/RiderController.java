@@ -2,8 +2,9 @@ package me.jibajo.rider_service.controller;
 
 import me.jibajo.rider_service.dto.RiderPhoneDto;
 import me.jibajo.rider_service.entities.Rider;
-import me.jibajo.rider_service.responses.APIResponse;
+import me.jibajo.rider_service.dto.APIResponse;
 import me.jibajo.rider_service.services.IRiderService;
+import me.jibajo.rider_service.services.clients.FareAndDistanceClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class RiderController {
 
     private final IRiderService riderService;
+    private final FareAndDistanceClient fareAndDistanceClient;
 
-    public RiderController(IRiderService riderService) {
+    public RiderController(IRiderService riderService, FareAndDistanceClient fareAndDistanceClient) {
         this.riderService = riderService;
+        this.fareAndDistanceClient = fareAndDistanceClient;
     }
 
     @PostMapping("/add")
@@ -75,5 +78,18 @@ public class RiderController {
                     .body(new APIResponse(e.getMessage(), null));
         }
     }
+
+    @GetMapping("/rc")
+    public ResponseEntity<APIResponse> getCaptainsWithFeign() {
+        try {
+            return ResponseEntity.ok(new APIResponse("Success", fareAndDistanceClient.getCaptains()));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+
 }
 

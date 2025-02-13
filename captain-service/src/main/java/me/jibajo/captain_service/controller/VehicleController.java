@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.jibajo.captain_service.dto.VehicleDTO;
 import me.jibajo.captain_service.entities.Vehicle;
 import me.jibajo.captain_service.exceptions.NotFoundException;
-import me.jibajo.captain_service.responses.APIResponse;
+import me.jibajo.captain_service.dto.APIResponse;
 import me.jibajo.captain_service.services.vehicle.IVehicleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

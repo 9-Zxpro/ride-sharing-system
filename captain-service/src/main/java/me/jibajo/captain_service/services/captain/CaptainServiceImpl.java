@@ -1,6 +1,8 @@
 package me.jibajo.captain_service.services.captain;
 
 import lombok.RequiredArgsConstructor;
+import me.jibajo.captain_service.config.RabbitConfig;
+import me.jibajo.captain_service.dto.APIResponse;
 import me.jibajo.captain_service.dto.CaptainDTO;
 import me.jibajo.captain_service.entities.Captain;
 import me.jibajo.captain_service.entities.Vehicle;
@@ -8,8 +10,14 @@ import me.jibajo.captain_service.exceptions.AlreadyExistsException;
 import me.jibajo.captain_service.exceptions.ResourceNotFoundException;
 import me.jibajo.captain_service.repositories.CaptainRepository;
 import me.jibajo.captain_service.repositories.VehicleRepository;
-import me.jibajo.captain_service.requests.CaptainRegRequest;
+import me.jibajo.captain_service.dto.CaptainRegRequest;
+import me.jibajo.captain_service.services.feignclient.RideManagerClient;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +30,18 @@ public class CaptainServiceImpl implements ICaptainService {
     private final CaptainRepository captainRepository;
     private final VehicleRepository vehicleRepository;
     private final ModelMapper modelMapper;
+    private final AmqpAdmin amqpAdmin;
+    private final RabbitConfig rabbitConfig;
+    private final RideManagerClient rideManagerClient;
+
+    @Value("${ride-offer.exchange}")
+    private String rideOfferExchange;
+
+    @Value("${ride-offer.queues-prefix}")
+    private String rideOfferQueuePrefix;
+
+    @Value("${ride-offer.routing-key-prefix}")
+    private String rideOfferRoutingKeyPrefix;
 
 
     @Override
@@ -101,9 +121,39 @@ public class CaptainServiceImpl implements ICaptainService {
         });
     }
 
+//    @Override
+//    public void availableCaptain(Long captainId) {
+//        Captain existingCaptain = captainRepository.findById(captainId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Captain with ID " + captainId + " not found."));
+//        existingCaptain.setIsOnline(true);
+//
+//        captainRepository.save(existingCaptain);
+//    }
+
     @Override
     public CaptainDTO convertToDto(Captain captain) {
         return modelMapper.map(captain, CaptainDTO.class);
+    }
+
+    @Override
+    public void createCaptainQueue(Long captainId) {
+        Queue queue = new Queue(rideOfferQueuePrefix+captainId);
+        amqpAdmin.declareQueue(queue);
+        Binding binding = BindingBuilder.bind(queue)
+                .to(rabbitConfig.rideOffersExchange())
+                .with(rideOfferRoutingKeyPrefix+captainId);
+        amqpAdmin.declareBinding(binding);
+    }
+
+    @Override
+    public void deleteCaptainQueue(Long captainId) {
+        amqpAdmin.deleteQueue(rideOfferQueuePrefix+captainId);
+    }
+
+    @Override
+    public APIResponse acceptRide(Long rideId, Long captainId) {
+        // Call to ride-manager-service to update the ride status.
+        return rideManagerClient.acceptedRideOffer(rideId, captainId);
     }
 
     private Vehicle vehicleCreate(CaptainRegRequest captainRegRequest) {

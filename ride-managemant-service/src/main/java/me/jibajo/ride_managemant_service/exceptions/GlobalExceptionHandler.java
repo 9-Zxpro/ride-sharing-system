@@ -33,8 +33,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("An unexpected error occurred: " + ex.getMessage());
     }
 
-    @ExceptionHandler(DistanceCalculationException.class)
+    @ExceptionHandler(InvalidStatusTransitionException.class)
     public ResponseEntity<String> handleInvalidStatusTransitionException(InvalidStatusTransitionException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("An unexpected error occurred: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(RouteCalculationException.class)
+    public ResponseEntity<String> handleRouteCalculationException(RouteCalculationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("An unexpected error occurred: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(CoordinatesCalculationException.class)
+    public ResponseEntity<String> handleCoordinatesCalculationException(CoordinatesCalculationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("An unexpected error occurred: " + ex.getMessage());
     }
 }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <script src="https://cdn.tailwindcss.com"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+ <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+ <title>Ride Offers</title>
+</head>
+ <body class="bg-gray-100 p-4">
+  <div class="flex space-x-4">
+   <!-- Sidebar -->
+   <div class="w-1/4 space-y-4 sidebar">
+    <div class="flex items-center space-x-2 p-2 bg-white rounded-lg shadow">
+     <img alt="Car icon" class="w-6 h-6" height="30" src="https://storage.googleapis.com/a1aa/image/Ti4K-B-6EWiNOzbjFX4JdUQPA53OwwZSgerKtdSVbqA.jpg" width="30"/>
+     <div>
+      <div class="text-lg font-semibold">
+       ₹210
+      </div>
+      <div class="text-green-500">
+       ₹45
+      </div>
+     </div>
+    </div>
+   </div>
+   <!-- Main Content -->
+   <div class="w-3/4 p-4 bg-white rounded-lg shadow main-content">
+    <div class="flex items-center justify-between">
+     <div class="flex items-center space-x-2">
+      <img alt="Car icon" class="w-6 h-6" height="30" src="https://storage.googleapis.com/a1aa/image/Ti4K-B-6EWiNOzbjFX4JdUQPA53OwwZSgerKtdSVbqA.jpg" width="30"/>
+      <div class="text-lg font-semibold">
+       ₹180 +
+       <span class="text-green-500">
+        ₹36
+       </span>
+      </div>
+     </div>
+     <div class="text-gray-500">
+      (Online)
+     </div>
+    </div>
+    <div class="mt-4">
+     <div class="flex items-center space-x-2">
+      <div class="w-4 h-4 bg-green-500 rounded-full">
+      </div>
+      <div>
+       <div class="font-semibold">
+        Road No. 36, Jubilee Hills,
+       </div>
+       <div class="text-gray-500 text-sm">
+        #326, Jubilee Hills Main Rd, Hyderabad
+       </div>
+      </div>
+     </div>
+     <div class="flex items-center space-x-2 mt-4">
+      <div class="w-4 h-4 bg-red-500 rounded-full">
+      </div>
+      <div>
+       <div class="font-semibold">
+        Cyber Towers, Hitech City
+       </div>
+       <div class="text-gray-500 text-sm">
+        Hitech City Rd. #478, Hitech City, Hyderabad
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="flex justify-between mt-4">
+     <div>
+      <div class="text-gray-500 text-sm">
+       Pickup
+      </div>
+      <div class="font-semibold">
+       1.8 Km
+      </div>
+     </div>
+     <div>
+      <div class="text-gray-500 text-sm">
+       Drop
+      </div>
+      <div class="font-semibold">
+       9.6 Km
+      </div>
+     </div>
+    </div>
+    <div class="flex items-center justify-between mt-4">
+     <button class="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
+      <i class="fas fa-times text-xl">
+      </i>
+     </button>
+     <button class="flex items-center justify-center w-32 h-12 bg-yellow-500 text-white font-semibold rounded-full">
+      Accept
+      <span class="ml-2 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center">
+       3
+      </span>
+     </button>
+    </div>
+   </div>
+   <h1>Ride Offers for Captain</h1>
+   <p>Your Captain ID: <span id="captainIdDisplay"></span></p>
+   <div id="offers"></div>
+  </div>
+
+  <script src="/static/dynamic.js"></script>
+  <script src="/static/rideOffer.js"></script>
+
+ </body>
+</html>
+
+

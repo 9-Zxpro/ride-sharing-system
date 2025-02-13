@@ -11,5 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class RideMatchingProperties {
     private double searchRadius;
-    private int maxDriversToConsider;
+    private int maxCaptainsToConsider;
 }

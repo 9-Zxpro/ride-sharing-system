@@ -7,37 +7,69 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
 
-    public static final String RIDE_REQUESTS_QUEUE = "ride-requests";
-    public static final String DRIVER_MATCHED_QUEUE = "driver-matched";
-    public static final String RIDE_EXCHANGE = "ride-exchange";
+    @Value("${ride-booking-request.exchange}")
+    private String RIDE_BOOKING_EXCHANGE;
+
+    @Value("${ride-booking-request.queue}")
+    private String RIDE_BOOK_REQUEST_QUEUE;
+
+    @Value("${ride-booking-request.routing-key}")
+    private String RIDE_BOOK_ROUTING_KEY;
+
+    @Value("${ride-offer.exchange}")
+    private String rideOfferExchange;
+
+    @Value("${ride-offer.queue}")
+    private String rideOfferQueue;
+
+    @Value("${ride-offer.routing-key}")
+    private String rideOfferRoutingKey;
 
     @Bean
-    public TopicExchange rideExchange() {
-        return new TopicExchange(RIDE_EXCHANGE);
+    public TopicExchange rideBookingExchange() {
+        return new TopicExchange(RIDE_BOOKING_EXCHANGE);
     }
 
     @Bean
-    public Queue rideRequestsQueue() {
-        return new Queue(RIDE_REQUESTS_QUEUE);
+    public Queue rideBookRequestQueue() {
+        return new Queue(RIDE_BOOK_REQUEST_QUEUE);
     }
 
     @Bean
-    public Queue driverMatchedQueue() {
-        return new Queue(DRIVER_MATCHED_QUEUE);
+    public Binding rideBookingRequestsBinding() {
+        return BindingBuilder.bind(rideBookRequestQueue())
+                .to(rideBookingExchange())
+                .with(RIDE_BOOK_ROUTING_KEY);
     }
 
     @Bean
-    public Binding rideRequestsBinding() {
-        return BindingBuilder.bind(rideRequestsQueue())
-                .to(rideExchange())
-                .with("ride.request");
+    public TopicExchange rideOfferExchange() {
+        return new TopicExchange(rideOfferExchange);
     }
+
+    @Bean
+    public Queue rideOfferQueue() {
+        return new Queue(rideOfferQueue);
+    }
+
+    @Bean
+    public Binding rideOfferBinding() {
+        return BindingBuilder.bind(rideOfferQueue())
+                .to(rideOfferExchange())
+                .with(rideOfferRoutingKey);
+    }
+
+//    @Bean
+//    public Queue driverMatchedQueue() {
+//        return new Queue(DRIVER_MATCHED_QUEUE);
+//    }
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {
