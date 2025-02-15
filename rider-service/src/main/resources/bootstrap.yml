@@ -4,6 +4,4 @@ spring:
   application:
     name: rider-service
 
-ride-management-service:
-  url: http://localhost:9090/api/captains
 

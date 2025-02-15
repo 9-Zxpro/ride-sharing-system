@@ -1,0 +1,20 @@
+spring:
+  config:
+    import: configserver:http://localhost:8080
+  application:
+    name: ride-management-service
+
+  redis:
+    host: redis-11264.c301.ap-south-1-1.ec2.redns.redis-cloud.com
+    port: 11264
+    username: default
+    password: onCEbasnaGQXkTPijSCW0CIa9CZ3ux1Q
+    ssl: true
+
+google:
+  maps:
+    api-key: AIzaSyBtNKGaAPNF4Aq7p1SyR9YEVKTFy4LapiI
+    endpoints:
+      distance-matrix: https://maps.googleapis.com/maps/api/distancematrix/json
+      directions: https://maps.googleapis.com/maps/api/directions/json
+      geocoding: https://maps.googleapis.com/maps/api/geocode/json

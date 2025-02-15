@@ -2,4 +2,4 @@ spring:
   config:
     import: configserver:http://localhost:8080
   application:
-    name: captain-service
+    name: notification-service
