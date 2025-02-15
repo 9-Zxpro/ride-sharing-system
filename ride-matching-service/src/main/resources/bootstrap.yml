@@ -1,32 +1,6 @@
-server:
-  port: 8086
 spring:
+  config:
+    import: configserver:http://localhost:8080
   application:
     name: ride-matching-service
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-  redis:
-    host: localhost
-    port: 6379
 
-ride-matching:
-  search-radius: 5.0 # kilometers
-  max-drivers-to-consider: 5
-
-ride-booking-request:
-  exchange: ride.booking.request.exchange
-  queue: ride.booking.request.queue
-  routing-key: ride.booking.request.key
-
-found-captain:
-  exchange: ride.matching.captain.exchange
-  queue: ride.matching.captain.queue
-  routing-key: ride.matching.captain.key
-
-ride-offer:
-  exchange: ride.offer.exchange
-  queue: ride.offer.queue
-  routing-key: ride.offer.key
