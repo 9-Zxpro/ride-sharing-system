@@ -2,7 +2,6 @@ package me.jibajo.ride_matching_service.services;
 
 import lombok.RequiredArgsConstructor;
 import me.jibajo.ride_matching_service.dto.FoundCaptain;
-import me.jibajo.ride_matching_service.enums.CaptainStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,11 +13,13 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class CaptainLocationService {
-    private static final String CAPTAIN_ONLINE_KEY = "captains:available";
+    @Value("${captain-on-duty-key}")
+    private String CAPTAIN_ON_DUTY_KEY;
+
     private final RedisTemplate<String, Long> redisTemplate;
 
     @Value("${ride-matching.max-drivers-to-consider}")
-    private final Long driver_limit;
+    private Long driver_limit;
 
     public List<FoundCaptain> findNearbyCaptains(double lat, double lng, double radiusKm) {
         Circle searchArea = new Circle(
@@ -27,7 +28,7 @@ public class CaptainLocationService {
         );
 
         return Objects.requireNonNull(redisTemplate.opsForGeo()
-                        .radius(CAPTAIN_ONLINE_KEY, searchArea))
+                        .radius(CAPTAIN_ON_DUTY_KEY, searchArea))
                 .getContent()
                 .stream()
                 .map(geo -> new FoundCaptain(
@@ -41,7 +42,7 @@ public class CaptainLocationService {
 
 //    public void updateDriverLocation(CaptainLocation location) {
 //        redisTemplate.opsForGeo().add(
-//                CAPTAIN_ONLINE_KEY,
+//                CAPTAIN_ON_DUTY_KEY,
 //                new Point(location.longitude(), location.latitude()),
 //                location.driverId()
 //        );

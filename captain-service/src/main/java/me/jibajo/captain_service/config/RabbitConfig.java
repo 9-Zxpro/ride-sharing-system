@@ -68,7 +68,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public RabbitTemplate restTemplate(ConnectionFactory connectionFactory) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
         return  template;
