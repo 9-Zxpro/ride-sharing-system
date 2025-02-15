@@ -4,17 +4,3 @@ spring:
   application:
     name: captain-service
 
-  redis:
-    host: redis-11264.c301.ap-south-1-1.ec2.redns.redis-cloud.com
-    port: 11264
-    username: default
-    password: onCEbasnaGQXkTPijSCW0CIa9CZ3ux1Q
-    ssl: true
-
-
-
-queue-count: 5
-ride-offer:
-  exchange: ride.offer.exchange
-  queues-prefix: captain.group.
-  routing-key-prefix: key.captain.group.
