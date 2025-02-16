@@ -45,6 +45,13 @@ public class RideController {
     @PostMapping("/ride-places")
     public ResponseEntity<APIResponse> getRouteDetails(@RequestBody RideOverviewDto rideOverviewDto) {
         return ResponseEntity.ok(new APIResponse("success",
+                routeCalculatorService.rideOverviewResponse(rideOverviewDto.pickupGeoPoint(),
+                        rideOverviewDto.dropoffGeoPoint())));
+    }
+
+    @PostMapping("/placesMatrix")
+    public ResponseEntity<APIResponse> getRouteDetail(@RequestBody RideOverviewDto rideOverviewDto) {
+        return ResponseEntity.ok(new APIResponse("success",
                 routeCalculatorService.calculateDistanceMatrix(rideOverviewDto.pickupGeoPoint(),
                         rideOverviewDto.dropoffGeoPoint())));
     }

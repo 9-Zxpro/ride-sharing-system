@@ -32,6 +32,15 @@ public class RabbitConfig {
     @Value("${ride-offer.routing-key}")
     private String rideOfferRoutingKey;
 
+    @Value("${found-captain.exchange}")
+    private String rideMatchingCaptainExchange;
+
+    @Value("${found-captain.queue}")
+    private String rideMatchingCaptainQueue;
+
+    @Value("${found-captain.routing-key}")
+    private String rideMatchingCaptainRoutingKey;
+
     @Bean
     public TopicExchange rideBookingExchange() {
         return new TopicExchange(RIDE_BOOKING_EXCHANGE);
@@ -64,6 +73,23 @@ public class RabbitConfig {
         return BindingBuilder.bind(rideOfferQueue())
                 .to(rideOfferExchange())
                 .with(rideOfferRoutingKey);
+    }
+
+    @Bean
+    public TopicExchange rideMatchingCaptainExchange() {
+        return new TopicExchange(rideMatchingCaptainExchange);
+    }
+
+    @Bean
+    public Queue rideMatchingCaptainQueue() {
+        return new Queue(rideMatchingCaptainQueue);
+    }
+
+    @Bean
+    public Binding rideMatchingCaptainBinding() {
+        return BindingBuilder.bind(rideMatchingCaptainQueue())
+                .to(rideMatchingCaptainExchange())
+                .with(rideMatchingCaptainRoutingKey);
     }
 
 //    @Bean

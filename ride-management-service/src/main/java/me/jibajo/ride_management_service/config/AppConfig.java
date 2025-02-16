@@ -1,5 +1,6 @@
 package me.jibajo.ride_management_service.config;
 
+import me.jibajo.ride_management_service.entities.Ride;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,7 @@ public class AppConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Ride.class));
         return template;
     }
 

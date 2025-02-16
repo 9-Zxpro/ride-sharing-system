@@ -6,6 +6,8 @@ import me.jibajo.ride_management_service.dto.GeoPoint;
 import me.jibajo.ride_management_service.dto.RideOffer;
 import me.jibajo.ride_management_service.dto.SuitableCaptain;
 import me.jibajo.ride_management_service.entities.Ride;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,8 @@ public class RideMatchingFoundCaptain {
     private final RabbitTemplate rabbitTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    private static final Logger logger = LoggerFactory.getLogger(RideMatchingFoundCaptain.class);
+
     @Value("${ride-cache-prefix}")
     private String rideCachePrefix;
 
@@ -30,15 +34,16 @@ public class RideMatchingFoundCaptain {
     @Value("${ride-offer.routing-key}")
     private String rideOfferRoutingKey;
 
-    @RabbitListener(queues = "${found-captain.queue}")
+    @RabbitListener(queues = "#{rideMatchingCaptainQueue}")
     public void foundRideMatchingCaptain(List<SuitableCaptain> suitableCaptains) {
+        logger.info("found-captain.queue consumed");
 
         for(SuitableCaptain candidate: suitableCaptains) {
             Ride ride = (Ride) redisTemplate.opsForValue().get(rideCachePrefix + candidate.rideId());
             if (ride == null) {
                 continue;
             }
-            if (!ride.getStatus().toString().equals("REQUESTED")) {
+            if (!ride.getStatus().name().equals("REQUESTED")) {
                 break;
             }
 
@@ -68,6 +73,7 @@ public class RideMatchingFoundCaptain {
                     rideOfferRoutingKey,
                     offer
             );
+            logger.info("ride offer published");
         }
     }
 }

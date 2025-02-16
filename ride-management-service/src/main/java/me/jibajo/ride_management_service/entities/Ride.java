@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.jibajo.ride_management_service.enums.RideStatus;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @Entity
@@ -34,8 +32,8 @@ public class Ride {
     })
     private Location dropOff;
 
-    private Instant rideStartTime;
-    private Instant rideEndTime;
+    private Long rideStartTime;
+    private Long rideEndTime;
 
     private Double distance;
     private Double fare;
@@ -44,6 +42,10 @@ public class Ride {
     private RideStatus status;
 
     @Column(nullable = false)
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Long createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = System.currentTimeMillis();
+    }
 }

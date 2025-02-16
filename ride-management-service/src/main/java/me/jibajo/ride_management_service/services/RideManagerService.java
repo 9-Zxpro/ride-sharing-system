@@ -10,6 +10,7 @@ import me.jibajo.ride_management_service.exceptions.DistanceCalculationException
 import me.jibajo.ride_management_service.exceptions.RideNotFoundException;
 import me.jibajo.ride_management_service.exceptions.RideRequestException;
 import me.jibajo.ride_management_service.repositories.RideRepository;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,25 +50,7 @@ public class RideManagerService {
                     .rideOverviewResponse(rideRequest.pickupGeoPoint(), rideRequest.dropoffGeoPoint());
             double fare = pricingStrategy.calculateFare(rideOverviewResponse.distance().value());
 
-            Location pickupLoc = new Location(
-                    rideRequest.pickupGeoPoint().latitude(),
-                    rideRequest.pickupGeoPoint().longitude()
-            );
-            Location dropOffLoc = new Location(
-                    rideRequest.dropoffGeoPoint().latitude(),
-                    rideRequest.dropoffGeoPoint().longitude()
-            );
-
-            Ride ride = new Ride();
-            ride.setRiderId(rideRequest.riderId());
-            ride.setOrigin(rideRequest.pickup());
-            ride.setDestination(rideRequest.dropOff());
-            ride.setPickup(pickupLoc);
-            ride.setDropOff(dropOffLoc);
-            ride.setDistance(rideOverviewResponse.distance().value());
-            ride.setFare(fare);
-            ride.setStatus(RideStatus.REQUESTED);
-            ride.setCreatedAt(Instant.now());
+            Ride ride = getRide(rideRequest, rideOverviewResponse, fare);
 
             Ride savedRide = rideRepository.save(ride);
 
@@ -83,6 +66,28 @@ public class RideManagerService {
         } catch (DistanceCalculationException e) {
             throw new RideRequestException("Could not create ride "+ e.getMessage());
         }
+    }
+
+    private static @NotNull Ride getRide(BookRideRequest rideRequest, RideOverviewResponse rideOverviewResponse, double fare) {
+        Location pickupLoc = new Location(
+                rideRequest.pickupGeoPoint().latitude(),
+                rideRequest.pickupGeoPoint().longitude()
+        );
+        Location dropOffLoc = new Location(
+                rideRequest.dropoffGeoPoint().latitude(),
+                rideRequest.dropoffGeoPoint().longitude()
+        );
+
+        Ride ride = new Ride();
+        ride.setRiderId(rideRequest.riderId());
+        ride.setOrigin(rideRequest.pickup());
+        ride.setDestination(rideRequest.dropOff());
+        ride.setPickup(pickupLoc);
+        ride.setDropOff(dropOffLoc);
+        ride.setDistance(rideOverviewResponse.distance().value());
+        ride.setFare(fare);
+        ride.setStatus(RideStatus.REQUESTED);
+        return ride;
     }
 
     public void updateRideStatusInCache(Long rideId, String status) {
@@ -103,10 +108,9 @@ public class RideManagerService {
 //        validateStatusTransition(ride.getStatus(), statusUpdate.newStatus());
 
         ride.setStatus(statusUpdate.newStatus());
-        ride.setUpdatedAt(Instant.now());
 
         if (statusUpdate.newStatus() == RideStatus.COMPLETED) {
-            ride.setRideEndTime(Instant.now());
+            ride.setRideEndTime(Instant.now().toEpochMilli());
         }
 
         Ride updatedRide = rideRepository.save(ride);

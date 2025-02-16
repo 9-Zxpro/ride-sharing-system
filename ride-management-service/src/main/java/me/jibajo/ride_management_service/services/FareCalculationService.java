@@ -19,6 +19,6 @@ public class FareCalculationService {
 //        double perMinuteFare = calculatePerMinuteFare(type);
 //        double timeBasedFare = durationMinutes * perMinuteFare;
 
-        return distanceKm * 2.5;
+        return distanceKm * 12.5;
     }
 }

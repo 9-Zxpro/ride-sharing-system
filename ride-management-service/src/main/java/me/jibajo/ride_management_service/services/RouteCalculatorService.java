@@ -34,8 +34,8 @@ public class RouteCalculatorService {
 
     public DistanceMatrixResponse calculateDistanceMatrix(GeoPoint origin, GeoPoint destination) {
         try {
-            String origins = origin.toString();
-            String destinations = destination.toString();
+            String origins = origin.latitude() + "," + origin.longitude();
+            String destinations = destination.latitude() + "," + destination.longitude();
             String url = String.format("%s?origins=%s&destinations=%s&key=%s",
                     this.distanceMatrixUrl, origins, destinations, this.apiKey);
 

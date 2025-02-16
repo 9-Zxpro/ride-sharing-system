@@ -16,10 +16,10 @@ public class RideResponseDto {
     private Long captainId;
     private Location pickupLocation;
     private Location dropoffLocation;
-    private Instant rideStartTime;
-    private Instant rideEndTime;
+    private Long rideStartTime;
+    private Long rideEndTime;
     private Double distance;
     private Double fare;
     private RideStatus status;
-    private Instant createdAt;
+    private Long createdAt;
 }
