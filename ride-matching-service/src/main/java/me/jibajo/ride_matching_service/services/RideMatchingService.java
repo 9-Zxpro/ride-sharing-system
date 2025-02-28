@@ -5,6 +5,8 @@ import me.jibajo.ride_matching_service.config.RideMatchingProperties;
 import me.jibajo.ride_matching_service.dto.FoundCaptain;
 import me.jibajo.ride_matching_service.dto.BookRideRequestEvent;
 import me.jibajo.ride_matching_service.dto.SuitableCaptain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,8 @@ public class RideMatchingService {
     private final RabbitTemplate rabbitTemplate;
     private final RideMatchingProperties properties;
 
+    private static final Logger logger = LoggerFactory.getLogger(RideMatchingService.class);
+
     @Value("${found-captain.exchange}")
     private String rideMatchingCaptainExchange;
 
@@ -31,10 +35,10 @@ public class RideMatchingService {
 
     @RabbitListener(queues = "${ride-booking-request.queue}")
     public void handleRideRequest(BookRideRequestEvent event) {
-        try {
+            logger.info("Ride booking request consumed");
             List<FoundCaptain> nearbyDrivers = captainLocationService.findNearbyCaptains(
-                    event.pickupGeoPoint().latitude(),
                     event.pickupGeoPoint().longitude(),
+                    event.pickupGeoPoint().latitude(),
                     properties.getSearchRadius()
             );
 
@@ -48,12 +52,11 @@ public class RideMatchingService {
             List<FoundCaptain> candidateCaptains = selectBestDriver(nearbyDrivers);
             List<SuitableCaptain> suitableCaptains = createSuitableCaptain(candidateCaptains, event);
 
+            // Publish candidate captains
             publishCandidateCaptains(suitableCaptains);
+            logger.info("Suitable captains published");
 //            updateDriverStatus(bestCaptains);
 
-        } catch (Exception e) {
-            //some exception
-        }
     }
 
     private List<SuitableCaptain> createSuitableCaptain(List<FoundCaptain> foundCaptains, BookRideRequestEvent event) {
@@ -62,9 +65,10 @@ public class RideMatchingService {
             SuitableCaptain suitableCaptain = new SuitableCaptain(
                     fc.captainId(),
                     event.rideId(),
-                    fc.lat(),
-                    fc.lng()
+                    fc.lng(),
+                    fc.lat()
             );
+            suitableCaptains.add(suitableCaptain);
         }
         return suitableCaptains;
     }
@@ -80,13 +84,13 @@ public class RideMatchingService {
     private List<FoundCaptain> selectBestDriver(
             List<FoundCaptain> captains
     ) {
-        // Simple selection: first 5 captain in list
+        // Simple selection: first 3 captain in list
         // TODO: implement scoring system based on:
         //  - Distance
         //  - Captain rating
         //  - Vehicle type match
         //  - Captain preference
-        return captains.subList(0, 5);
+        return captains.subList(0, 3);
     }
 
 //    private double calculateFinalFare(RideRequestEvent event) {

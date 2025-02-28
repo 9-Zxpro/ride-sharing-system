@@ -12,6 +12,8 @@ import me.jibajo.ride_management_service.exceptions.RideRequestException;
 import me.jibajo.ride_management_service.repositories.RideRepository;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,8 @@ public class RideManagerService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final DynamicPricingStrategy pricingStrategy;
     private final ModelMapper modelMapper;
+
+    private static final Logger logger = LoggerFactory.getLogger(RideManagerService.class);
 
     @Value("${ride-booking-request.exchange}")
     private String rideBookingRequestExchange;
@@ -58,7 +63,10 @@ public class RideManagerService {
             String key = rideCachePrefix + savedRide.getId();
             redisTemplate.opsForValue().set(key, savedRide);
 
+            redisTemplate.expire(key, 5, TimeUnit.MINUTES);
+
             // Publish ride request event
+            logger.info("ride booking request queue published.");
             publishRideBookingRequestEvent(savedRide);
 
             return convertToDto(savedRide);

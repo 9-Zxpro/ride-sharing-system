@@ -5,6 +5,6 @@ import java.io.Serializable;
 public record SuitableCaptain(
         Long captainId,
         Long rideId,
-        double lat,
-        double lng
+        double lng,
+        double lat
 ) implements Serializable { }

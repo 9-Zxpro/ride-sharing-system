@@ -2,11 +2,12 @@ package me.jibajo.captain_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.jibajo.captain_service.dto.APIResponse;
+import me.jibajo.captain_service.dto.CaptainOnDuty;
 import me.jibajo.captain_service.dto.CaptainRegRequest;
-import me.jibajo.captain_service.enums.CaptainStatus;
 import me.jibajo.captain_service.exceptions.NotFoundException;
 import me.jibajo.captain_service.services.captain.CaptainStatusService;
 import me.jibajo.captain_service.services.captain.ICaptainService;
+import me.jibajo.captain_service.services.feignclient.RideManagerClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class CaptainController {
 
     private final ICaptainService captainService;
     private final CaptainStatusService captainStatusService;
+    private final RideManagerClient rideManagerClient;
 
     @PostMapping("/add")
     public ResponseEntity<APIResponse> createCaptain(@RequestBody CaptainRegRequest captainRegRequest) {
@@ -68,30 +70,30 @@ public class CaptainController {
         }
     }
 
-    @PostMapping("/{id}/onDuty")
-    public ResponseEntity<APIResponse> onlineCaptain(@PathVariable long captainId,
-                                                     @RequestParam CaptainStatus status,
-                                                     @RequestParam double lat,
-                                                     @RequestParam double lng) {
+    @PostMapping("/{captainId}/onDuty")
+    public ResponseEntity<APIResponse> onlineCaptain(@PathVariable Long captainId,
+                                                     @RequestBody CaptainOnDuty captainOnDuty) {
         try {
-            captainService.createCaptainQueue(captainId);
-
             return ResponseEntity.ok(new APIResponse("Captain is Online",
-                    captainStatusService.createOrUpdateCaptainStatus(
-                            captainId,
-                            status,
-                            lat,
-                            lng)));
+                    captainStatusService.createOrUpdateCaptainStatus( captainId, captainOnDuty)));
         } catch (Exception e) {
             return ResponseEntity.status(CONFLICT).body(new APIResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/onDuty/{captainId}/status")
+    public ResponseEntity<APIResponse> getOnDutyCaptainStatus(@PathVariable Long captainId) {
+        try {
+            return ResponseEntity.ok(new APIResponse("Success",
+                    captainStatusService.getCaptainStatus(captainId)));
+        } catch (Exception e) {
+            return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
     }
 
     @DeleteMapping("/{id}/offDuty")
     public ResponseEntity<APIResponse> offlineCaptain(@PathVariable Long id) {
         try {
-            captainService.deleteCaptainQueue(id);
-
             captainStatusService.removeCaptain(id);
             return ResponseEntity.ok(new APIResponse("Captain goes offline Successfully", null));
         } catch (Exception e) {
@@ -102,7 +104,8 @@ public class CaptainController {
     @PostMapping("/{captainId}/accept/{rideId}")
     public ResponseEntity<APIResponse> acceptRide(@PathVariable Long captainId,
                                                   @PathVariable Long rideId) {
-        APIResponse response = captainService.acceptRide(rideId, captainId);
+//        APIResponse response = captainService.acceptRide(rideId, captainId);
+        APIResponse response = rideManagerClient.acceptedRideOffer(rideId, captainId);
         return ResponseEntity.ok(response);
     }
 }

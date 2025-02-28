@@ -1,14 +1,17 @@
 package me.jibajo.captain_service.services.captain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import me.jibajo.captain_service.dto.CaptainOnDuty;
 import me.jibajo.captain_service.enums.CaptainStatus;
 import me.jibajo.captain_service.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,50 +23,48 @@ public class CaptainStatusService {
     private static final String CAPTAIN_KEY_PREFIX = "captain:";
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public Void createOrUpdateCaptainStatus(Long captainId, CaptainStatus status,
-                                                           Double lat, Double lng) {
+    private static final Logger logger = LoggerFactory.getLogger(CaptainStatusService.class);
+
+    public Void createOrUpdateCaptainStatus(Long captainId, CaptainOnDuty captainOnDuty) {
         String key = CAPTAIN_KEY_PREFIX + captainId;
 
+//        redisTemplate.opsForGeo().add(
+//                "captains:onDuty",
+//                new Point(captainOnDuty.lng(), captainOnDuty.lat()),
+//                String.valueOf(captainId)
+//        );
+        logger.info("Captain ID before conversion: {}", captainId);
+        String captainIdString = String.valueOf(captainId);
+        logger.info("Captain ID after conversion: {}", captainIdString);
         redisTemplate.opsForGeo().add(
-                "captains:available",
-                new Point(lng, lat),
-                captainId
+                "captains:onDuty",
+                new Point(captainOnDuty.lng(), captainOnDuty.lat()),
+                captainIdString
         );
+        logger.info("Captain ID stored in Redis: {}", captainIdString);
 
         redisTemplate.opsForHash().putAll(key, Map.of(
-                "captainId", captainId,
-                "status", status,
-                "lat", lat,
-                "lng", lng,
+                "captainId", String.valueOf(captainId),
+                "status", captainOnDuty.status().name(),
+                "lat", String.valueOf(captainOnDuty.lat()),
+                "lng", String.valueOf(captainOnDuty.lng()),
                 "lastUpdated", Instant.now().toString()
         ));
 
-//        redisTemplate.opsForHash().put(key, "captainId", captainId.toString());
-//        redisTemplate.opsForHash().put(key, "status", status.name());
-//
-//        if (lat != null && lng != null) {
-//            redisTemplate.opsForHash().put(key, "lat", lat.toString());
-//            redisTemplate.opsForHash().put(key, "lng", lng.toString());
-//        }
-
-        redisTemplate.expire(key, 5, TimeUnit.MINUTES);
-
-//        Map<Object, Object> captainData = redisTemplate.opsForHash().entries(key);
-//        Map<String, Object> responseData = new HashMap<>();
-//        captainData.forEach((k, v) -> responseData.put(k.toString(), v));
-//
-//        if (responseData.containsKey("lat")) {
-//            responseData.put("lat", Double.parseDouble((String) responseData.get("lat")));
-//        }
-//        if (responseData.containsKey("lng")) {
-//            responseData.put("lng", Double.parseDouble((String) responseData.get("lng")));
-//        }
+//        redisTemplate.expire("captains:onDuty", 30, TimeUnit.MINUTES);
+//        redisTemplate.expire(key, 30, TimeUnit.MINUTES);
 
         return null;
     }
 
     public CaptainStatus getCaptainStatus(Long captainId) {
-        return (CaptainStatus) redisTemplate.opsForValue().get(CAPTAIN_KEY_PREFIX + captainId);
+        String statusString = (String) redisTemplate.opsForHash().get(CAPTAIN_KEY_PREFIX + captainId, "status");
+
+        if (statusString == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(statusString, CaptainStatus.class);
     }
 
     public void removeCaptain(Long captainId) {
@@ -80,7 +81,7 @@ public class CaptainStatusService {
         return keys.stream()
                 .filter(key -> {
                     String status = (String) redisTemplate.opsForHash().get(key, "status");
-                    return CaptainStatus.ONLINE.name().equals(status);
+                    return CaptainStatus.ON_DUTY.name().equals(status);
                 })
                 .map(key -> key.replace(CAPTAIN_KEY_PREFIX, ""))
                 .toList();

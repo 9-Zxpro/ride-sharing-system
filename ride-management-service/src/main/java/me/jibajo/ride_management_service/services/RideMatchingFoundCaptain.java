@@ -34,7 +34,7 @@ public class RideMatchingFoundCaptain {
     @Value("${ride-offer.routing-key}")
     private String rideOfferRoutingKey;
 
-    @RabbitListener(queues = "#{rideMatchingCaptainQueue}")
+    @RabbitListener(queues = "${found-captain.queue}")
     public void foundRideMatchingCaptain(List<SuitableCaptain> suitableCaptains) {
         logger.info("found-captain.queue consumed");
 
@@ -47,14 +47,12 @@ public class RideMatchingFoundCaptain {
                 break;
             }
 
-            GeoPoint ridePickup = new GeoPoint(ride.getPickup().getLatitude(), ride.getPickup().getLongitude());
-            GeoPoint candidateGeo = new GeoPoint(candidate.lat(), candidate.lng());
+            GeoPoint ridePickup = new GeoPoint(ride.getPickup().getLongitude(), ride.getPickup().getLatitude());
+            GeoPoint candidateGeo = new GeoPoint(candidate.lng(), candidate.lat());
 
-            DistanceMatrixResponse distanceResponse = routeCalculatorService
-                    .calculateDistanceMatrix(ridePickup, candidateGeo);
+            DistanceMatrixResponse distanceResponse = routeCalculatorService.calculateDistanceMatrix(ridePickup, candidateGeo);
 
-            double pickupDistance = distanceResponse.rows().getFirst()
-                    .elements().getFirst().distance().value();
+            double pickupDistance = distanceResponse.rows().getFirst().elements().getFirst().distance().value();
 
             RideOffer offer = new RideOffer(
                     ride.getId(),
@@ -66,8 +64,7 @@ public class RideMatchingFoundCaptain {
                     ride.getFare()
             );
 
-            // Publish the ride offer to the candidate's dedicated queue.
-            // Here, we use a routing key that is based on the candidate's captainId.
+            // Publish the ride offer.
             rabbitTemplate.convertAndSend(
                     rideOfferExchange,
                     rideOfferRoutingKey,
