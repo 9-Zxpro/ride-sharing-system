@@ -1,110 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <script src="https://cdn.tailwindcss.com"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
- <title>Ride Offers</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ride Offers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
 </head>
- <body class="bg-gray-100 p-4">
-  <div class="flex space-x-4">
-   <!-- Sidebar -->
-   <div class="w-1/4 space-y-4 sidebar">
-    <div class="flex items-center space-x-2 p-2 bg-white rounded-lg shadow">
-     <img alt="Car icon" class="w-6 h-6" height="30" src="https://storage.googleapis.com/a1aa/image/Ti4K-B-6EWiNOzbjFX4JdUQPA53OwwZSgerKtdSVbqA.jpg" width="30"/>
-     <div>
-      <div class="text-lg font-semibold">
-       ₹210
-      </div>
-      <div class="text-green-500">
-       ₹45
-      </div>
-     </div>
-    </div>
-   </div>
-   <!-- Main Content -->
-   <div class="w-3/4 p-4 bg-white rounded-lg shadow main-content">
-    <div class="flex items-center justify-between">
-     <div class="flex items-center space-x-2">
-      <img alt="Car icon" class="w-6 h-6" height="30" src="https://storage.googleapis.com/a1aa/image/Ti4K-B-6EWiNOzbjFX4JdUQPA53OwwZSgerKtdSVbqA.jpg" width="30"/>
-      <div class="text-lg font-semibold">
-       ₹180 +
-       <span class="text-green-500">
-        ₹36
-       </span>
-      </div>
-     </div>
-     <div class="text-gray-500">
-      (Online)
-     </div>
-    </div>
-    <div class="mt-4">
-     <div class="flex items-center space-x-2">
-      <div class="w-4 h-4 bg-green-500 rounded-full">
-      </div>
-      <div>
-       <div class="font-semibold">
-        Road No. 36, Jubilee Hills,
-       </div>
-       <div class="text-gray-500 text-sm">
-        #326, Jubilee Hills Main Rd, Hyderabad
-       </div>
-      </div>
-     </div>
-     <div class="flex items-center space-x-2 mt-4">
-      <div class="w-4 h-4 bg-red-500 rounded-full">
-      </div>
-      <div>
-       <div class="font-semibold">
-        Cyber Towers, Hitech City
-       </div>
-       <div class="text-gray-500 text-sm">
-        Hitech City Rd. #478, Hitech City, Hyderabad
-       </div>
-      </div>
-     </div>
-    </div>
-    <div class="flex justify-between mt-4">
-     <div>
-      <div class="text-gray-500 text-sm">
-       Pickup
-      </div>
-      <div class="font-semibold">
-       1.8 Km
-      </div>
-     </div>
-     <div>
-      <div class="text-gray-500 text-sm">
-       Drop
-      </div>
-      <div class="font-semibold">
-       9.6 Km
-      </div>
-     </div>
-    </div>
-    <div class="flex items-center justify-between mt-4">
-     <button class="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
-      <i class="fas fa-times text-xl">
-      </i>
-     </button>
-     <button class="flex items-center justify-center w-32 h-12 bg-yellow-500 text-white font-semibold rounded-full">
-      Accept
-      <span class="ml-2 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center">
-       3
-      </span>
-     </button>
-    </div>
-   </div>
-   <h1>Ride Offers for Captain</h1>
-   <p>Your Captain ID: <span id="captainIdDisplay"></span></p>
-   <div id="offers"></div>
-  </div>
+<body class="bg-gray-100 p-4">
+<div class="flex space-x-4">
+    <!-- Sidebar -->
+    <div class="w-1/4 space-y-4 sidebar"></div>
 
-  <script src="/static/dynamic.js"></script>
-  <script src="/static/rideOffer.js"></script>
+    <!-- Main Content -->
+    <div class="w-3/4 p-4 bg-white rounded-lg shadow main-content"></div>
+</div>
 
- </body>
+<script>
+    const captainId = 2;
+
+    const container = document.querySelector(".container");
+    const offerList = document.querySelector(".sidebar");
+    const offerDetails = document.querySelector(".main-content");
+
+    let offers = [];
+
+    const socket = new SockJS("http://localhost:8082/ws");
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect(
+      {},
+      function (frame) {
+        console.log("Connected: " + frame);
+        stompClient.subscribe(
+          "/topic/captain/" + captainId,
+          function (message) {
+            console.log("🚀 Ride Offer Received:", message.body);
+            try {
+              const offer = JSON.parse(message.body);
+              // Add the new offer to the array
+              offers.push(offer);
+              // Re-render the sidebar with updated offers
+              renderOffers();
+              // If this is the first offer received, display its details
+              if (offers.length === 1) {
+                showOfferDetails(0);
+              }
+            } catch (e) {
+              console.error("Error parsing message:", e);
+            }
+          },
+          function (error) {
+            console.error("Subscription error:", error);
+          }
+        );
+      },
+      function (error) {
+        console.error("STOMP connection error:", error);
+      }
+    );
+
+    // Render the sidebar with available offers
+    function renderOffers() {
+      if (offers.length === 0) {
+             offerDetails.innerHTML = `<div class="p-4 text-gray-500">No ride offers available</div>`;
+             return;
+           }
+
+      offerList.innerHTML = "";
+      offers.forEach((offer, index) => {
+        const offerItem = document.createElement("div");
+        offerItem.className =
+          "flex items-center space-x-2 p-2 bg-white rounded-lg shadow hover:bg-gray-100 cursor-pointer " +
+          (index === 0 ? "border-2 border-green-500" : "");
+        offerItem.innerHTML = `
+          <img src="https://storage.googleapis.com/a1aa/image/Ti4K-B-6EWiNOzbjFX4JdUQPA53OwwZSgerKtdSVbqA.jpg" alt="Car icon" class="w-6 h-6" />
+          <div>
+            <div class="text-lg font-semibold"><span>&#8377;</span>${offer.fare}</div>
+            <div class="text-lg font-semibold"><span>&#8377;</span>${offer.pickupDistance}</div>
+          </div>
+        `;
+        offerItem.addEventListener("click", () => showOfferDetails(index));
+        offerList.appendChild(offerItem);
+      });
+    }
+
+    // Display selected offer details in the main content area
+    function showOfferDetails(index) {
+      const selectedOffer = offers[index];
+      offerDetails.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <img src="https://storage.googleapis.com/a1aa/image/Ti4K-B-6EWiNOzbjFX4JdUQPA53OwwZSgerKtdSVbqA.jpg" alt="Car icon" class="w-6 h-6" />
+            <div class="text-lg font-semibold">
+              <span>&#8377;</span>${selectedOffer.fare}
+              <span class="text-sm text-gray-500">(${selectedOffer.pickupDistance} m)</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+            <div>
+              <div class="font-semibold">${selectedOffer.pickupAddress}</div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-4">
+            <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+            <div>
+              <div class="font-semibold">${selectedOffer.dropoffAddress}</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-between mt-4">
+          <div>
+            <div class="text-gray-500 text-sm">Pickup</div>
+            <div class="font-semibold">${selectedOffer.pickupDistance}</div>
+          </div>
+          <div>
+            <div class="text-gray-500 text-sm">Drop</div>
+            <div class="font-semibold">${selectedOffer.dropDistance}</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-4">
+          <button onclick="rejectOffer(${selectedOffer.rideId}, ${selectedOffer.captainId})" id="reject-${selectedOffer.rideId}" class="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+          <button onclick="acceptOffer(${selectedOffer.rideId}, ${selectedOffer.captainId})" id="accept-${selectedOffer.rideId}" class="flex items-center justify-center w-32 h-12 bg-yellow-500 text-white font-semibold rounded-full">
+            Accept
+            <span class="ml-2 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center">3</span>
+          </button>
+        </div>
+      `;
+
+      // Update sidebar selection (highlight the active offer)
+      Array.from(offerList.children).forEach((child, i) => {
+        child.className =
+          "flex items-center space-x-2 p-2 bg-white rounded-lg shadow hover:bg-gray-100 cursor-pointer " +
+          (i === index ? "border-2 border-green-500" : "");
+      });
+    }
+
+    // Function to accept a ride offer
+    function acceptOffer(rideId, captainId) {
+      fetch(`/api/captains/${captainId}/accept/${rideId}`, {
+        method: "POST",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const acceptanceMessage = data.message;
+          const rideConfirmation = data.data; // Access the first 'data' object
+
+          let additionalInfo = "";
+          if (rideConfirmation && rideConfirmation.data) { // Check if rideConfirmation and its 'data' exist
+            additionalInfo = `OTP: ${rideConfirmation.data.otp}, Phone: ${rideConfirmation.data.phone}, Vehicle: ${rideConfirmation.data.vehicleNumber}`;
+          }
+
+          alert(`${acceptanceMessage} ${additionalInfo}`);
+          removeOfferFromUI(rideId);
+        })
+        .catch((error) => {
+          console.error("Error accepting offer:", error);
+          alert("Error accepting offer");
+        });
+    }
+
+    // Function to reject a ride offer
+    function rejectOffer(rideId, captainId) {
+      alert("Offer rejected for Ride ID " + rideId);
+      removeOfferFromUI(rideId);
+    }
+
+    // Remove an offer from the offers array and update the UI
+    function removeOfferFromUI(rideId) {
+      offers = offers.filter((offer) => offer.id !== rideId);
+      renderOffers();
+      // Optionally clear details if no offer remains or if the currently displayed offer was removed
+      if (offers.length === 0) {
+        offerDetails.innerHTML = "";
+      }
+    }
+</script>
+</body>
 </html>
-
-

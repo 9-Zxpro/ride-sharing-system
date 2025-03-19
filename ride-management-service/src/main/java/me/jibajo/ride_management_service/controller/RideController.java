@@ -5,6 +5,10 @@ import me.jibajo.ride_management_service.dto.*;
 import me.jibajo.ride_management_service.services.RouteCalculatorService;
 import me.jibajo.ride_management_service.services.LocalRouteService;
 import me.jibajo.ride_management_service.services.RideManagerService;
+import me.jibajo.ride_management_service.services.feignclients.CaptainServiceClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +19,10 @@ public class RideController {
 
     private final RideManagerService rideManagerService;
     private final RouteCalculatorService routeCalculatorService;
+    private final CaptainServiceClient captainServiceClient;
     private final LocalRouteService localRouteService;
+
+    public static final Logger logger = LoggerFactory.getLogger(RideController.class);
 
     @PostMapping("/request")
     public ResponseEntity<RideResponseDto> requestRide(@RequestBody BookRideRequest bookRideRequest) {
@@ -70,8 +77,55 @@ public class RideController {
     }
 
     @PostMapping("/{rideId}/accept/{captainId}")
-    public APIResponse acceptRide(@PathVariable Long rideId, @PathVariable Long captainId) {
-        return new APIResponse("Ride accepted by captain.",
-                rideManagerService.rideAccepted(rideId, captainId));
+    public ResponseEntity<APIResponse> acceptRide(@PathVariable Long rideId, @PathVariable Long captainId,
+                                  @RequestBody CaptainDTO captainDTO) {
+        return ResponseEntity.ok(new APIResponse("Ride accepted by captain.",
+                rideManagerService.rideAccepted(rideId, captainId, captainDTO)));
     }
+
+    @PostMapping("{captainId}/start/{rideId}")
+    public ResponseEntity<APIResponse> startRideProcess(@PathVariable Long rideId,
+                                                         @PathVariable Long captainId,
+                                                         @RequestBody GeoPoint geoPoint) {
+        try {
+            APIResponse rideUpdated = rideManagerService.updateRideStatusToStart(rideId);
+            Boolean rideUpdatedData = rideUpdated != null ? (Boolean) rideUpdated.getData() : null;
+
+            APIResponse captainResponse;
+            boolean captainUpdated;
+            try {
+                captainResponse = captainServiceClient.updateCaptainStatus(captainId, geoPoint);
+                captainUpdated = captainResponse != null && Boolean.TRUE.equals(captainResponse.getData());
+            } catch (Exception e) {
+                captainUpdated = false;
+            }
+
+            if (Boolean.TRUE.equals(rideUpdatedData) && captainUpdated) {
+                return ResponseEntity.ok(new APIResponse("Ride started successfully.", true));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new APIResponse("Failed to start ride or update captain status.", false));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new APIResponse("An error occurred while starting the ride.", false));
+        }
+    }
+
+    @PostMapping("/{captainId}/ride-completed/{rideId}")
+    public ResponseEntity<APIResponse> rideCompleted(@PathVariable Long rideId,
+                                                         @PathVariable Long captainId) {
+        try {
+            APIResponse rideUpdated = rideManagerService.updateRideStatusToComplete(rideId);
+            Boolean rideUpdatedData = rideUpdated != null ? (Boolean) rideUpdated.getData() : null;
+
+            return ResponseEntity.ok(new APIResponse("Ride completed successfully.", true));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new APIResponse("An error occurred while completing the ride.", false));
+        }
+    }
+
+
 }

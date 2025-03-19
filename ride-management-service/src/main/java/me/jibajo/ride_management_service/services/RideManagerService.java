@@ -10,17 +10,20 @@ import me.jibajo.ride_management_service.exceptions.DistanceCalculationException
 import me.jibajo.ride_management_service.exceptions.RideNotFoundException;
 import me.jibajo.ride_management_service.exceptions.RideRequestException;
 import me.jibajo.ride_management_service.repositories.RideRepository;
+import me.jibajo.ride_management_service.services.feignclients.CaptainServiceClient;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +36,8 @@ public class RideManagerService {
     private final RabbitTemplate rabbitTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
     private final DynamicPricingStrategy pricingStrategy;
+    private final OtpService otpService;
+    private final CaptainServiceClient captainServiceClient;
     private final ModelMapper modelMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(RideManagerService.class);
@@ -182,7 +187,7 @@ public class RideManagerService {
         }
     }
 
-    public APIResponse rideAccepted(Long rideId, Long captainId){
+    public APIResponse rideAccepted(Long rideId, Long captainId, CaptainDTO captainDTO){
         Ride ride = (Ride) redisTemplate.opsForValue().get(rideCachePrefix + rideId);
         if (ride == null) {
             return new APIResponse("Ride not found in cache", null);
@@ -191,10 +196,56 @@ public class RideManagerService {
         ride.setStatus(RideStatus.DRIVER_ASSIGNED);
         ride.setCaptainId(captainId);
 
-        String key = rideCachePrefix + rideId;
-        redisTemplate.opsForValue().set(key, ride);
+        redisTemplate.opsForValue().set(rideCachePrefix + rideId, ride);
 
-        return new APIResponse("Ride accepted successfully", ride);
+        RideAccepted rideAcceptedDto = rideAcceptedResponse(rideId, captainDTO);
+
+        return new APIResponse("Ride accepted successfully", rideAcceptedDto);
+    }
+
+    public APIResponse updateRideStatusToStart(Long rideId) {
+        Ride ride = (Ride) redisTemplate.opsForValue().get(rideCachePrefix + rideId);
+        if (ride == null) {
+            return new APIResponse("Ride not found in cache", false);
+        }
+
+        ride.setStatus(RideStatus.IN_PROGRESS);
+        ride.setRideStartTime(Instant.now().toEpochMilli());
+        redisTemplate.opsForValue().set(rideCachePrefix + rideId, ride);
+
+        return new APIResponse("Ride status updated to IN_PROGRESS in cache", true);
+    }
+
+    public APIResponse updateRideStatusToComplete(Long rideId) {
+        Ride ride = (Ride) redisTemplate.opsForValue().get(rideCachePrefix + rideId);
+        if (ride == null) {
+            return new APIResponse("Ride not found in cache", false);
+        }
+
+        //    Save ride to persistent storage
+        ride.setStatus(RideStatus.COMPLETED);
+        ride.setRideEndTime(Instant.now().toEpochMilli());
+        redisTemplate.opsForValue().set(rideCachePrefix + rideId, ride);
+        rideRepository.save(ride);
+
+        //    update the captain
+        try {
+            APIResponse captainResponse = captainServiceClient.updateCaptainStatusToONDUTY(ride.getCaptainId());
+            if (!Boolean.TRUE.equals(captainResponse.getData())) {
+                return new APIResponse("Ride completed but failed to update captain status", false);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to update captain status for captainId {}: {}", ride.getCaptainId(), e.getMessage());
+        }
+
+        //    inform the rider
+//        try {
+//            notificationService.sendRideCompletionNotification(riderId, rideId);
+//        } catch (Exception e) {
+//            logger.error("Failed to notify riderId {} about ride completion: {}", riderId, e.getMessage());
+//        }
+
+        return new APIResponse("Ride status updated to Complete in cache and stored in database", true);
     }
 
     public RideResponseDto getRideById(Long rideId) {
@@ -207,4 +258,16 @@ public class RideManagerService {
         return modelMapper.map(ride, RideResponseDto.class);
     }
 
+    private RideAccepted rideAcceptedResponse(Long rideId, CaptainDTO captainDto){
+        Ride ride = (Ride) redisTemplate.opsForValue().get(rideCachePrefix + rideId);
+        List<Point> position = redisTemplate.opsForGeo().position("captains:onDuty", captainDto.captainId());
+        String otp = otpService.generateOtp(rideId);
+
+        RideAccepted rideAccepted = new RideAccepted(
+                otp,
+                captainDto.phone(),
+                captainDto.vehicleRegistrationNumber()
+        );
+        return rideAccepted;
+    }
 }

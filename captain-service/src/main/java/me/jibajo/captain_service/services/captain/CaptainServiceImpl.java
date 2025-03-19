@@ -34,16 +34,6 @@ public class CaptainServiceImpl implements ICaptainService {
     private final RabbitConfig rabbitConfig;
     private final RideManagerClient rideManagerClient;
 
-    @Value("${ride-offer.exchange}")
-    private String rideOfferExchange;
-
-    @Value("${ride-offer.queues-prefix}")
-    private String rideOfferQueuePrefix;
-
-    @Value("${ride-offer.routing-key-prefix}")
-    private String rideOfferRoutingKeyPrefix;
-
-
     @Override
     public Captain createCaptain(CaptainRegRequest captainRegRequest) {
         if (captainRepository.existsByPhone(captainRegRequest.getPhone())) {
@@ -135,26 +125,11 @@ public class CaptainServiceImpl implements ICaptainService {
         return modelMapper.map(captain, CaptainDTO.class);
     }
 
-    @Override
-    public void createCaptainQueue(Long captainId) {
-        Queue queue = new Queue(rideOfferQueuePrefix+captainId);
-        amqpAdmin.declareQueue(queue);
-        Binding binding = BindingBuilder.bind(queue)
-                .to(rabbitConfig.rideOffersExchange())
-                .with(rideOfferRoutingKeyPrefix+captainId);
-        amqpAdmin.declareBinding(binding);
-    }
-
-    @Override
-    public void deleteCaptainQueue(Long captainId) {
-        amqpAdmin.deleteQueue(rideOfferQueuePrefix+captainId);
-    }
-
-    @Override
-    public APIResponse acceptRide(Long rideId, Long captainId) {
-        // Call to ride-manager-service to update the ride status.
-        return rideManagerClient.acceptedRideOffer(rideId, captainId);
-    }
+//    @Override
+//    public APIResponse acceptRide(Long rideId, Long captainId, CaptainDTO captainDTO) {
+//        // Call to ride-manager-service to update the ride status.
+//        return rideManagerClient.acceptedRideOffer(rideId, captainId, captainDTO);
+//    }
 
     private Vehicle vehicleCreate(CaptainRegRequest captainRegRequest) {
         Vehicle vehicle = new Vehicle();

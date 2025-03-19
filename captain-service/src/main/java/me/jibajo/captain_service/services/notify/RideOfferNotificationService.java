@@ -1,7 +1,7 @@
-package me.jibajo.notification_service.services;
+package me.jibajo.captain_service.services.notify;
 
 import lombok.RequiredArgsConstructor;
-import me.jibajo.notification_service.dto.RideOffer;
+import me.jibajo.captain_service.dto.RideOffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

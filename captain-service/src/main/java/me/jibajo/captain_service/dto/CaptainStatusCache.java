@@ -4,8 +4,7 @@ import me.jibajo.captain_service.enums.CaptainStatus;
 
 import java.io.Serializable;
 
-public record CaptainOnDuty (
+public record CaptainStatusCache(
     CaptainStatus status,
-    Double lat,
-    Double lng
+    GeoPoint point
 ) implements Serializable {}

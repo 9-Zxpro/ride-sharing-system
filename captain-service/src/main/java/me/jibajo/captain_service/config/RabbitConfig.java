@@ -17,19 +17,19 @@ import java.util.List;
 @Configuration
 public class RabbitConfig {
 
-    @Value("${ride-offer.exchange}")
-    private String RIDE_OFFER_EXCHANGE;
-
-    @Value("${ride-offer.queues-prefix}")
-    private String RIDE_OFFER_QUEUE_PREFIX;
-
-    @Value("${ride-offer.routing-key-prefix}")
-    private String RIDE_OFFER_ROUTING_KEY_PREFIX;
-
-    @Bean
-    public TopicExchange rideOffersExchange() {
-        return new TopicExchange(RIDE_OFFER_EXCHANGE);
-    }
+//    @Value("${ride-offer.exchange}")
+//    private String RIDE_OFFER_EXCHANGE;
+//
+//    @Value("${ride-offer.queues-prefix}")
+//    private String RIDE_OFFER_QUEUE_PREFIX;
+//
+//    @Value("${ride-offer.routing-key-prefix}")
+//    private String RIDE_OFFER_ROUTING_KEY_PREFIX;
+//
+//    @Bean
+//    public TopicExchange rideOffersExchange() {
+//        return new TopicExchange(RIDE_OFFER_EXCHANGE);
+//    }
 
 //    @Bean
 //    public List<Queue> captainGroupQueues() {

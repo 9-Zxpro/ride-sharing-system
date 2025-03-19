@@ -25,9 +25,5 @@ public interface ICaptainService {
 
     CaptainDTO convertToDto(Captain captain);
 
-    void createCaptainQueue(Long captainId);
-
-    void deleteCaptainQueue(Long captainId);
-
-    APIResponse acceptRide(Long rideId, Long captainId);
+//    APIResponse acceptRide(Long rideId, Long captainId, CaptainDTO captainDTO);
 }

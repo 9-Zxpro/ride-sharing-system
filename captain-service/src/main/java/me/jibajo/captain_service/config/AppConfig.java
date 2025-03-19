@@ -61,15 +61,14 @@ public class AppConfig {
         return template;
     }
 
-
-//    @Bean
-//    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
-//        RedisTemplate<String, String> template = new RedisTemplate<>();
-//        template.setConnectionFactory(factory);
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setValueSerializer(new GenericToStringSerializer<>(String.class));
-//        return template;
-//    }
+    @Bean
+    public RedisTemplate<String, String> otpRedisTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        return template;
+    }
 
 //    public class ConnectBasicTest {
 //        public void connectBasic() {

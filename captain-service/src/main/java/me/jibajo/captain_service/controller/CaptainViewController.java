@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/captain/view")
 public class CaptainViewController {
 
-    @GetMapping("/ride")
+    @GetMapping("/ride/{id}")
     public String getCaptainById(@PathVariable Long id) {
         return "index";
     }
 
-    @RequestMapping("/ride/offer")
-    public String home(Model model) {
-        model.addAttribute("pageName", "This is jiba.com");
-        model.addAttribute("github", "https://github.com/9-zxpro");
-        return "index";
-    }
+//    @RequestMapping("/ride/offer")
+//    public String home(Model model) {
+//        model.addAttribute("pageName", "This is jiba.com");
+//        model.addAttribute("github", "https://github.com/9-zxpro");
+//        return "index";
+//    }
 }

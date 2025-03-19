@@ -1,4 +1,4 @@
-package me.jibajo.notification_service.config;
+package me.jibajo.captain_service.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

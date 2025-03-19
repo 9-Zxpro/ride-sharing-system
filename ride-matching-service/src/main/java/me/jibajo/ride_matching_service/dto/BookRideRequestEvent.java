@@ -23,3 +23,4 @@ public record BookRideRequestEvent(
         Objects.requireNonNull(dropoffGeoPoint, "DropoffGeoPoint must not be null");
     }
 }
+

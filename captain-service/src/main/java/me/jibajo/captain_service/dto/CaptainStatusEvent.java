@@ -7,6 +7,5 @@ import java.io.Serializable;
 public record CaptainStatusEvent(
         Long captainId,
         CaptainStatus status,
-        Double lat,
-        Double lng
+        GeoPoint point
 ) implements Serializable {}
